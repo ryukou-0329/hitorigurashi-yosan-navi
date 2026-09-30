@@ -1,0 +1,16 @@
+---
+import { SITE_NAME, DISCLAIMER } from '../config/site';
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <p>{DISCLAIMER}</p>
+    <p>入力した内容はお使いのブラウザ内だけで計算し、サーバーへの送信・保存は行いません。</p>
+    <ul>
+      <li><a href="/guide/">お金の基礎ガイド</a></li>
+      <li><a href="/about/">運営者情報</a></li>
+      <li><a href="/privacy/">プライバシーポリシー</a></li>
+      <li><a href="/disclosure/">広告・PR表記について</a></li>
+    </ul>
+    <p>© {new Date().getFullYear()} {SITE_NAME}</p>
+  </div>
+</footer>

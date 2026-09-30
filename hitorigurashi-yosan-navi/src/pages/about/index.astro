@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE_NAME, LAST_UPDATED } from '../../config/site';
+
+const title = '運営者情報';
+const description = `${SITE_NAME}の運営者情報、サイトの目的、免責事項について。`;
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '運営者情報', path: '/about/' },
+];
+---
+<BaseLayout title={title} description={description} path="/about/" breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <div class="content">
+    <h2>サイトについて</h2>
+    <p>{SITE_NAME}は、一人暮らしを考えている方が、生活費や初期費用の目安を手軽に確認できる無料のWebツールです。入力した内容はお使いのブラウザ内だけで計算し、サーバーへ送信・保存しません。</p>
+
+    <h2>運営者</h2>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><th>サイト名</th><td>{SITE_NAME}</td></tr>
+          <tr><th>運営者名</th><td class="todo-note">（公開前に記入してください）</td></tr>
+          <tr><th>連絡先</th><td class="todo-note">（公開前に記入してください：メールアドレスまたはお問い合わせフォームのURL）</td></tr>
+          <tr><th>最終更新日</th><td>{LAST_UPDATED}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>データと出典について</h2>
+    <p>食費・水道光熱費の目安（2025年・単身世帯の平均）は総務省統計局「家計調査」、仲介手数料の参考額（家賃0.5か月分＋消費税の場合）の考え方は国土交通省告示を出典としています。出典と確認年月は各ページの末尾に記載しています。一次情報で確認できない数値は、推測で表示せず、ご自身で入力いただく形にしています。</p>
+
+    <h2>免責事項</h2>
+    <p>当サイトの表示内容は一般的な目安であり、実際の費用は物件・地域・契約条件・生活状況等によって異なります。計算結果は、一人暮らしを始められるかどうかを判断・保証するものではありません。契約や購入など具体的な判断は、見積書や契約書の内容をご確認のうえ、ご自身の責任で行ってください。当サイトの利用により生じた損害について、運営者は責任を負いかねます。</p>
+    <p>広告・アフィリエイトの取り扱いについては<a href="/disclosure/">広告・PR表記について</a>、個人情報の取り扱いについては<a href="/privacy/">プライバシーポリシー</a>をご覧ください。</p>
+  </div>
+</BaseLayout>

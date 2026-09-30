@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Calculator from '../../components/Calculator.astro';
+import SourceList from '../../components/SourceList.astro';
+import { webAppLd } from '../../lib/seo';
+
+const title = '一人暮らしの初期費用シミュレーター';
+const description =
+  '家賃と見積書の金額から、一人暮らしを始めるときの想定初期費用、支払い後の貯金、不足額、不足を貯めるまでの月数を計算。入力内容はブラウザ内だけで処理します。';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '初期費用シミュレーター', path: '/initial-cost/' },
+];
+---
+<BaseLayout title={title} description={description} path="/initial-cost/" breadcrumbs={breadcrumbs}
+  jsonLd={[webAppLd({ name: title, description, path: '/initial-cost/' }, Astro.site)]}>
+  <h1>{title}</h1>
+  <p class="lead">家賃と貯金を入れて、初期費用の内訳を入力すると、支払い後の貯金や不足額がわかります。</p>
+  <Calculator focus="initial" />
+
+  <div class="content">
+    <h2>初期費用に含まれるおもな項目</h2>
+    <p>敷金、礼金、仲介手数料、保証会社の初回費用、火災保険料、鍵交換費用、引越し費用、家具・家電の購入費、前家賃などがあります。どの項目がかかるか、いくらになるかは物件や契約で異なるため、気になる物件の見積書・重要事項説明書で確認してください。</p>
+    <p>仲介手数料は、見積書の金額を入力してください。未入力の間は、参考額（家賃0.5か月分＋消費税の場合）を別に表示しますが、合計には含めません。契約・承諾状況などによって実際の仲介手数料は異なるため、見積書・契約内容を確認してください。</p>
+    <p>「想定初期費用」と表示されるのは、必要な項目がすべて入力されたときだけです。入力していない項目がある間は「入力済み項目の合計」と表示され、実際の初期費用より少なくなっている可能性があります。</p>
+    <SourceList ids={['takkenKokuji']} />
+  </div>
+</BaseLayout>

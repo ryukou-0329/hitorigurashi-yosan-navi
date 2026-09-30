@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Calculator from '../../components/Calculator.astro';
+import SourceList from '../../components/SourceList.astro';
+import { INCOME_AMOUNTS, RENT_AMOUNTS } from '../../data/pages';
+import { KAKEI as K, statBasis } from '../../data/statistics';
+import { manYen, yen } from '../../lib/format';
+import { webAppLd } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return INCOME_AMOUNTS.map((amount) => ({ params: { amount: String(amount) }, props: { amount } }));
+}
+interface Props { amount: number }
+const { amount } = Astro.props as Props;
+
+const label = manYen(amount);
+const path = `/income/${amount}/`;
+const title = `手取り${label}の一人暮らし｜生活費・余剰金シミュレーション`;
+const description = `手取り${label}で一人暮らしをした場合の生活費と毎月残る金額をシミュレーション。家賃別の残額や、平均的な支出との差も確認できます。`;
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '手取り別生活費', path: '/income/' },
+  { name: `手取り${label}`, path },
+];
+const compare = [{ label: statBasis(K.consumption), value: K.consumption.amountYen }];
+---
+<BaseLayout title={title} description={description} path={path} breadcrumbs={breadcrumbs}
+  jsonLd={[webAppLd({ name: title, description, path }, Astro.site)]}>
+  <h1>手取り{label}の一人暮らし</h1>
+  <p class="lead">手取り{label}を入力済みです。家賃や生活スタイルを入れると、毎月残る金額がわかります。</p>
+  <Calculator focus="all" defaultTakeHome={amount} />
+
+  <div class="content">
+    <h2>平均的な支出と比べると</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>比較対象（月額）</th><th class="num">平均額</th><th class="num">手取り{label}との差</th></tr></thead>
+        <tbody>
+          {compare.map((c) => (
+            <tr><td>{c.label}</td><td class="num">{yen(c.value)}</td><td class="num">{yen(amount - c.value)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">総務省統計局「家計調査」2025年平均の単身世帯（世帯主の平均年齢58.6歳、勤労者以外の世帯を含む）。20代など若い世代や、勤労者だけに絞った数値ではありません。消費支出には税・社会保険料や貯蓄は含まれません。差がプラスでも、余裕があるという意味ではありません。</p>
+
+    <h2>家賃別に見た、手取り{label}の残り</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th class="num">家賃</th><th class="num">家賃を引いた残り</th><th class="num">さらに食費（{statBasis(K.food)} {yen(K.food.amountYen)}）を引いた残り</th></tr></thead>
+        <tbody>
+          {RENT_AMOUNTS.map((r) => (
+            <tr><td class="num">{yen(r)}</td><td class="num">{yen(amount - r)}</td><td class="num">{yen(amount - r - K.food.amountYen)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">食費は家計調査（2025年・単身世帯の食料の月平均 {yen(K.food.amountYen)}）で計算した単純な引き算です。ご自身の食費とは異なる場合があります。水道光熱費・通信費・交通費・娯楽費などはまだ引いていません。</p>
+
+    <h2>ほかの手取りで見る</h2>
+    <ul class="link-grid">
+      {INCOME_AMOUNTS.filter((a) => a !== amount).map((a) => <li><a href={`/income/${a}/`}>手取り<br />{manYen(a)}</a></li>)}
+    </ul>
+    <p><a href="/rent/">家賃別の初期費用</a>も確認できます。</p>
+    <SourceList ids={['kakeiSummary2025']} />
+  </div>
+</BaseLayout>

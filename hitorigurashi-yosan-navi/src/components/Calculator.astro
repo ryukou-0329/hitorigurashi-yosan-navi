@@ -1,0 +1,169 @@
+---
+/**
+ * 診断フォーム＋結果表示。入力はブラウザ内だけで計算します（送信・保存なし）。
+ *  focus="all"     : 総合診断（/）
+ *  focus="living"  : 生活費に絞る（/living-cost/）
+ *  focus="initial" : 初期費用を先に表示（/initial-cost/, /rent/*）
+ */
+import { LIVING_CATEGORIES } from '../data/standards';
+import { INITIAL_ITEMS } from '../data/initialCost';
+import AdSlot from './AdSlot.astro';
+import AffiliateBox from './AffiliateBox.astro';
+import Disclaimer from './Disclaimer.astro';
+
+interface Props {
+  focus?: 'all' | 'living' | 'initial';
+  defaultTakeHome?: number;
+  defaultRent?: number;
+}
+const { focus = 'all', defaultTakeHome, defaultRent } = Astro.props;
+const showInitial = focus !== 'living';
+const initialItemsInput = INITIAL_ITEMS;
+const fmtDefault = (n?: number) => (n === undefined ? '' : n.toLocaleString('ja-JP'));
+---
+<form id="calc-form" class="calc" novalidate autocomplete="off" data-focus={focus} onsubmit="return false">
+  <fieldset class="group">
+    <legend>基本情報</legend>
+    <div class:list={['grid', showInitial && 'cols-3']}>
+      <div class="field">
+        <label for="takeHome">月の手取り<span class="req">必須</span></label>
+        <div class="input-row">
+          <input id="takeHome" type="text" inputmode="numeric" autocomplete="off" placeholder="例 200,000" value={fmtDefault(defaultTakeHome)} data-kind="yen" aria-describedby="takeHome-hint" />
+          <span class="unit">円</span>
+        </div>
+        <p class="hint" id="takeHome-hint">税・社会保険料を引いた後の金額</p>
+      </div>
+      <div class="field">
+        <label for="rent">希望家賃<span class="req">必須</span></label>
+        <div class="input-row">
+          <input id="rent" type="text" inputmode="numeric" autocomplete="off" placeholder="例 70,000" value={fmtDefault(defaultRent)} data-kind="yen" aria-describedby="rent-hint" />
+          <span class="unit">円</span>
+        </div>
+        <p class="hint" id="rent-hint">管理費・共益費を含めた月額</p>
+      </div>
+      {showInitial && (
+        <div class="field">
+          <label for="savings">現在の貯金</label>
+          <div class="input-row">
+            <input id="savings" type="text" inputmode="numeric" autocomplete="off" placeholder="例 300,000" data-kind="yen" aria-describedby="savings-hint" />
+            <span class="unit">円</span>
+          </div>
+          <p class="hint" id="savings-hint">初期費用に使える金額</p>
+        </div>
+      )}
+    </div>
+  </fieldset>
+
+  <fieldset class="group">
+    <legend>生活スタイル（1か月あたり）</legend>
+    <div class="grid">
+      {LIVING_CATEGORIES.map((c) => (
+        <div class="field">
+          <label for={c.presets.length > 0 ? `sel-${c.id}` : `amt-${c.id}`}>{c.label}</label>
+          {c.presets.length > 0 && (
+            <select id={`sel-${c.id}`} data-cat={c.id} aria-describedby={`hint-${c.id}`}>
+              {c.presets.map((p, i) => (
+                <option value={p.id} selected={i === 0}>{p.label}</option>
+              ))}
+              <option value="manual">金額を入力する</option>
+            </select>
+          )}
+          <div class="manual input-row" id={`wrap-${c.id}`} hidden={c.presets.length > 0} style={c.presets.length > 0 ? 'margin-top:6px' : ''}>
+            <input id={`amt-${c.id}`} type="text" inputmode="numeric" autocomplete="off" placeholder="0" data-kind="yen" aria-label={`${c.label}の金額`} aria-describedby={`hint-${c.id}`} />
+            <span class="unit">円</span>
+          </div>
+          <p class="hint" id={`hint-${c.id}`}>{c.hint}{c.presets.length === 0 && c.todo ? '（標準額は準備中のため、金額を入力してください）' : ''}</p>
+        </div>
+      ))}
+    </div>
+  </fieldset>
+
+  {showInitial && (
+    <details class="group" open={focus === 'initial'}>
+      <summary>初期費用の内訳を入力（任意・見積書があれば）</summary>
+      <div class="grid">
+        {initialItemsInput.map((it) => (
+          <div class="field">
+            <label for={`ini-${it.id}`}>{it.label}</label>
+            <div class="input-row">
+              <input id={`ini-${it.id}`} type="text" inputmode={it.kind === 'months' ? 'decimal' : 'numeric'} autocomplete="off" placeholder={it.kind === 'months' ? '例 1' : '0'} data-kind={it.kind} aria-describedby={`ini-hint-${it.id}`} />
+              <span class="unit">{it.kind === 'months' ? 'か月分' : '円'}</span>
+            </div>
+            <p class="hint" id={`ini-hint-${it.id}`}>{it.hint}</p>
+          </div>
+        ))}
+        <p class="hint span-2">仲介手数料が未入力の間は、参考額（家賃0.5か月分＋消費税の場合）を結果欄に別表示します。参考額は合計に含まれません。契約・承諾状況などによって実際の仲介手数料は異なるため、見積書・契約内容を確認してください。</p>
+      </div>
+    </details>
+  )}
+</form>
+
+<section id="results" class="results" data-focus={focus} aria-labelledby="results-title">
+  <h2 id="results-title">診断結果</h2>
+  <p class="sr-only" aria-live="polite" data-out="srSummary"></p>
+  <p class="placeholder" data-out="placeholder">「月の手取り」と「希望家賃」を入力すると、結果がここに表示されます。</p>
+
+  <div class="results-inner" data-out="wrap" hidden>
+    <div data-block="living">
+      <div class="cards cols-3">
+        <div class="card"><p class="card__label" data-out="monthlyLabel">月間生活費</p><p class="card__value" data-out="monthlyCost">–</p><p class="card__note" data-out="monthlyCostNote"></p></div>
+        <div class="card" data-out="surplusCard"><p class="card__label" data-out="surplusLabel">毎月残る金額</p><p class="card__value" data-out="monthlySurplus">–</p><p class="card__note" data-out="surplusNote"></p></div>
+        <div class="card" data-out="yearlyCard"><p class="card__label" data-out="yearlyLabel">年間の余剰金見込み</p><p class="card__value" data-out="yearlySurplus">–</p><p class="card__note" data-out="yearlyNote">毎月残る金額×12か月</p></div>
+      </div>
+      <p class="notice" data-out="livingMissing" hidden></p>
+      <div class="block">
+        <h3>支出の内訳（月額）</h3>
+        <ul class="bars" data-out="livingBreakdown"></ul>
+      </div>
+    </div>
+
+    {showInitial && (
+      <div data-block="status">
+        <div class="block">
+          <h3>初期費用と貯金の関係</h3>
+          <p class="status-line" data-out="statusLine" hidden>
+            <span class="badge" data-out="statusBadge"></span>
+            <span data-out="statusReason" style="font-size:.875rem"></span>
+          </p>
+          <div class="cards cols-2" style="margin-bottom:0">
+            <div class="card"><p class="card__label" data-out="initialLabel">入力済み項目の合計</p><p class="card__value" data-out="initialTotal">–</p><p class="card__note" data-out="initialNote"></p></div>
+            <div class="card" data-out="afterCard"><p class="card__label" data-out="afterLabel">入力済み項目の支払い後の貯金</p><p class="card__value" data-out="savingsAfter">–</p><p class="card__note" data-out="afterNote"></p></div>
+            <div class="card" data-out="shortCard"><p class="card__label" data-out="shortLabel">入力済み項目に対する不足額</p><p class="card__value" data-out="shortfall">–</p><p class="card__note" data-out="shortNote"></p></div>
+          </div>
+          <p class="hint" style="margin-top:10px">「入力上は残額あり／要確認／不足あり」は、入力された数値だけを基準にした表示です（未入力の項目は含まれません）。当サイト独自の簡易基準（初期費用の支払い後に貯金が月間生活費1か月分以上残るか）で、金融的な安全性や、実際に始められるかどうかを示すものではありません。実際の判断はご自身の状況で行ってください。</p>
+        </div>
+      </div>
+    )}
+
+    {showInitial && (
+      <div data-block="initial">
+        <p class="notice" data-out="initialMissing" hidden></p>
+        <div class="block">
+          <h3>初期費用の内訳</h3>
+          <ul class="bars" data-out="initialBreakdown"></ul>
+          <p class="hint" style="margin-top:8px">合計に入るのは、入力した金額だけです。仲介手数料の参考額（家賃0.5か月分＋消費税の場合）は合計に含めません。契約・承諾状況などによって実際の仲介手数料は異なるため、見積書・契約内容を確認してください。</p>
+        </div>
+      </div>
+    )}
+
+    <div data-block="tips">
+      <div class="block">
+        <h3>見直しの候補・ヒント</h3>
+        <ul class="tips" data-out="tips"></ul>
+      </div>
+    </div>
+  </div>
+
+  <AdSlot placement="after-results" />
+  <AffiliateBox placement="after-results" />
+  <Disclaimer />
+</section>
+
+<div class="quickbar" data-out="quickbar" hidden>
+  <span><span data-out="quickLabel">毎月残る金額</span> <b data-out="quickSurplus">–</b></span>
+  <a href="#results">結果を見る ↓</a>
+</div>
+
+<script>
+  import '../scripts/calculator';
+</script>

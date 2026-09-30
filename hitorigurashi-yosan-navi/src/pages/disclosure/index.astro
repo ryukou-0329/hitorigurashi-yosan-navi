@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE_NAME, LAST_UPDATED } from '../../config/site';
+
+const title = '広告・PR表記について';
+const description = `${SITE_NAME}における広告・アフィリエイト・PR表記の方針。`;
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '広告・PR表記について', path: '/disclosure/' },
+];
+---
+<BaseLayout title={title} description={description} path="/disclosure/" breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <div class="content">
+    <h2>現在の状況</h2>
+    <p>現時点で、当サイトには広告およびアフィリエイトリンクは掲載していません。</p>
+
+    <h2>今後、広告・アフィリエイトを利用する場合の方針</h2>
+    <ul>
+      <li>広告（Google AdSense等）を表示する場合は、広告であることが分かるよう「広告」と表示します。</li>
+      <li>アフィリエイトリンクや、事業者から報酬を得て紹介するコンテンツには、リンクの近くに「PR」「広告」等の表示を付けます。</li>
+      <li>広告・PRの表示は、計算結果や入力欄の操作を妨げない位置に配置します。</li>
+      <li>広告・アフィリエイトの有無によって、計算ロジックや計算結果の数値を変えることはありません。</li>
+      <li>紹介するサービスは、利用者にとって役立つかどうかを基準に選びます。報酬の有無は、内容の正確さ・公平さの判断に影響させません。</li>
+      <li>景品表示法（ステルスマーケティングの規制を含む）その他の関連法令およびガイドラインを守ります。</li>
+    </ul>
+
+    <h2>導入時の対応</h2>
+    <p>広告・アフィリエイトを導入する際は、本ページと<a href="/privacy/">プライバシーポリシー</a>を、実際の内容に合わせて更新します。</p>
+    <p class="hint">最終更新日：{LAST_UPDATED}</p>
+  </div>
+</BaseLayout>

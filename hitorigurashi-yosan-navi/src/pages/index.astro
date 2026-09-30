@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Calculator from '../components/Calculator.astro';
+import SourceList from '../components/SourceList.astro';
+import { SITE_NAME, SITE_DESCRIPTION } from '../config/site';
+import { webAppLd } from '../lib/seo';
+
+const title = `${SITE_NAME}｜一人暮らしの生活費・初期費用をかんたんシミュレーション`;
+---
+<BaseLayout
+  title={title}
+  description={SITE_DESCRIPTION}
+  path="/"
+  jsonLd={[webAppLd({ name: SITE_NAME, description: SITE_DESCRIPTION, path: '/' }, Astro.site)]}
+>
+  <h1>一人暮らしのお金、<br />ざっくり見てみよう</h1>
+  <p class="lead">手取りと家賃を入れるだけで、毎月残る金額と初期費用の目安がわかります。入力内容はこの端末の中だけで計算します。</p>
+
+  <Calculator focus="all" />
+
+  <div class="content">
+    <h2>もっと詳しく見る</h2>
+    <ul class="link-grid">
+      <li><a href="/living-cost/">生活費だけ<br />計算する</a></li>
+      <li><a href="/initial-cost/">初期費用だけ<br />計算する</a></li>
+      <li><a href="/income/">手取り別の<br />生活費</a></li>
+      <li><a href="/rent/">家賃別の<br />初期費用</a></li>
+      <li><a href="/guide/">お金の<br />基礎ガイド</a></li>
+    </ul>
+
+    <h2>このツールで使っている数値</h2>
+    <p>食費・水道光熱費の目安は総務省統計局「家計調査」の2025年・単身世帯の平均（世帯主の平均年齢58.6歳、勤労者以外を含む）で、20代など若い世代に絞った数値ではありません。仲介手数料の参考額（家賃0.5か月分＋消費税の場合）は国土交通省告示をもとにした計算値で、確定額ではありません。それ以外の項目（スマホ料金・敷金礼金・引越し費用など）は物件や契約、使い方で大きく変わるため、標準額を決めつけず、ご自身の見込みや見積書の金額を入力する形にしています。</p>
+    <SourceList />
+    <p class="hint">結果は判定ではなく、ご自身で検討するための参考情報です。</p>
+  </div>
+</BaseLayout>

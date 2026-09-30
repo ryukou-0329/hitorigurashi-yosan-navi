@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Calculator from '../../components/Calculator.astro';
+import SourceList from '../../components/SourceList.astro';
+import { INCOME_AMOUNTS, RENT_AMOUNTS } from '../../data/pages';
+import { agentFeeReference } from '../../lib/calc';
+import { manYen, yen } from '../../lib/format';
+import { webAppLd } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return RENT_AMOUNTS.map((amount) => ({ params: { amount: String(amount) }, props: { amount } }));
+}
+interface Props { amount: number }
+const { amount } = Astro.props as Props;
+
+const label = manYen(amount);
+const path = `/rent/${amount}/`;
+const title = `家賃${label}の一人暮らし｜初期費用シミュレーション`;
+const description = `家賃${label}の物件で一人暮らしを始めるときの初期費用をシミュレーション。仲介手数料の参考額や敷金・礼金の計算例、支払い後の貯金と不足額を確認できます。`;
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '家賃別初期費用', path: '/rent/' },
+  { name: `家賃${label}`, path },
+];
+const months = [0, 1, 2];
+---
+<BaseLayout title={title} description={description} path={path} breadcrumbs={breadcrumbs}
+  jsonLd={[webAppLd({ name: title, description, path }, Astro.site)]}>
+  <h1>家賃{label}の初期費用</h1>
+  <p class="lead">家賃{label}を入力済みです。貯金と見積書の金額を入れると、支払い後の貯金や不足額がわかります。</p>
+  <Calculator focus="initial" defaultRent={amount} />
+
+  <div class="content">
+    <h2>家賃{label}の場合の計算例</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>項目</th><th class="num">金額</th></tr></thead>
+        <tbody>
+          <tr><td>仲介手数料の参考額（家賃0.5か月分＋消費税10%の場合）</td><td class="num">{yen(agentFeeReference(amount))}</td></tr>
+          {months.map((m) => (
+            <tr><td>敷金または礼金が{m}か月分の場合</td><td class="num">{yen(amount * m)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">敷金・礼金の月数は物件や契約で異なります（表は「家賃×月数」の計算例で、標準的な月数を示すものではありません）。仲介手数料の参考額は「家賃0.5か月分＋消費税」の場合の計算値で、確定額ではありません。契約・承諾状況などによって実際の仲介手数料は異なるため、見積書・契約内容を確認してください。保証会社・火災保険・鍵交換・引越し・家具家電などの費用は、上のフォームに見積書の金額を入力してください。</p>
+
+    <h2>ほかの家賃で見る</h2>
+    <ul class="link-grid">
+      {RENT_AMOUNTS.filter((a) => a !== amount).map((a) => <li><a href={`/rent/${a}/`}>家賃<br />{manYen(a)}</a></li>)}
+    </ul>
+    <p>手取りとの関係は<a href={`/income/${INCOME_AMOUNTS[1]}/`}>手取り別の生活費</a>でも確認できます。</p>
+    <SourceList ids={['takkenKokuji']} />
+  </div>
+</BaseLayout>

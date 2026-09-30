@@ -1,0 +1,10 @@
+---
+/**
+ * 将来の広告（AdSense 等）用の空コンポーネント。現時点では何も表示しません。
+ * 使うときは <AdSlot placement="after-results" /> のように計算結果の邪魔にならない位置へ配置し、
+ * この中に広告タグを追加します。広告表示時は必ず「広告」ラベルを付けてください（/disclosure/ 参照）。
+ */
+interface Props { placement?: string }
+const { placement = 'default' } = Astro.props;
+---
+<div class="ad-slot" data-placement={placement}></div>

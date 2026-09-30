@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { INCOME_AMOUNTS } from '../../data/pages';
+import { manYen } from '../../lib/format';
+
+const title = '手取り別の一人暮らし生活費';
+const description = '手取り15万円〜40万円の一人暮らしについて、平均的な支出との差や家賃を引いた後の残額を確認できます。';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '手取り別生活費', path: '/income/' },
+];
+---
+<BaseLayout title={title} description={description} path="/income/" breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <p class="lead">手取りの金額を選ぶと、その金額での生活費シミュレーションを確認できます。</p>
+  <div class="content">
+    <ul class="link-grid">
+      {INCOME_AMOUNTS.map((a) => <li><a href={`/income/${a}/`}>手取り<br />{manYen(a)}</a></li>)}
+    </ul>
+    <p>金額がこの中にない場合は、<a href="/">総合診断</a>で任意の手取りを入力できます。</p>
+  </div>
+</BaseLayout>

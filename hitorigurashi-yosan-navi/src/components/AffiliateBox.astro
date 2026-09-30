@@ -1,0 +1,9 @@
+---
+/**
+ * 将来のアフィリエイト枠用の空コンポーネント。現時点では何も表示しません。
+ * 使うときは「PR」表記を必ず付け、/disclosure/ の方針に従ってください。
+ */
+interface Props { placement?: string }
+const { placement = 'default' } = Astro.props;
+---
+<div class="affiliate-box" data-placement={placement}></div>

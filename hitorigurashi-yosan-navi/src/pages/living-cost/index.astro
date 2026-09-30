@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Calculator from '../../components/Calculator.astro';
+import SourceList from '../../components/SourceList.astro';
+import { webAppLd } from '../../lib/seo';
+import { KAKEI as K } from '../../data/statistics';
+import { yen } from '../../lib/format';
+
+const title = '一人暮らしの生活費シミュレーター';
+const description =
+  '手取り・家賃・食費・スマホ代などを入力して、一人暮らしの月間生活費と毎月残る金額、年間の余剰金見込みを計算。入力内容はブラウザ内だけで処理します。';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '生活費シミュレーター', path: '/living-cost/' },
+];
+---
+<BaseLayout title={title} description={description} path="/living-cost/" breadcrumbs={breadcrumbs}
+  jsonLd={[webAppLd({ name: title, description, path: '/living-cost/' }, Astro.site)]}>
+  <h1>{title}</h1>
+  <p class="lead">毎月の生活費と、手取りから残る金額を計算します。</p>
+  <Calculator focus="living" />
+
+  <div class="content">
+    <h2>参考：2025年・単身世帯の平均</h2>
+    <p>総務省統計局「家計調査」（2025年平均）では、単身世帯（世帯主の平均年齢58.6歳、勤労者以外の世帯を含む）の消費支出は1世帯当たり1か月平均で{yen(K.consumption.amountYen)}、うち食料は{yen(K.food.amountYen)}、住居は{yen(K.housing.amountYen)}です。</p>
+    <p>これは全国の単身世帯全体の平均で、20代など若い世代や、勤労者だけに絞った数値ではありません。住居の平均には持ち家などの世帯も含まれるため、賃貸で暮らす場合の家賃とは一致しません。比較の材料としてご覧ください。</p>
+    <SourceList ids={['kakeiSummary2025']} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { RENT_AMOUNTS } from '../../data/pages';
+import { manYen } from '../../lib/format';
+
+const title = '家賃別の一人暮らし初期費用';
+const description = '家賃4万円〜10万円の一人暮らしについて、仲介手数料の参考額や敷金・礼金の計算例、初期費用のシミュレーションを確認できます。';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '家賃別初期費用', path: '/rent/' },
+];
+---
+<BaseLayout title={title} description={description} path="/rent/" breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <p class="lead">家賃の金額を選ぶと、その家賃での初期費用シミュレーションを確認できます。</p>
+  <div class="content">
+    <ul class="link-grid">
+      {RENT_AMOUNTS.map((a) => <li><a href={`/rent/${a}/`}>家賃<br />{manYen(a)}</a></li>)}
+    </ul>
+    <p>金額がこの中にない場合は、<a href="/initial-cost/">初期費用シミュレーター</a>で任意の家賃を入力できます。</p>
+  </div>
+</BaseLayout>

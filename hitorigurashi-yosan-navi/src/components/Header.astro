@@ -1,0 +1,27 @@
+---
+import { SITE_NAME } from '../config/site';
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/', label: '総合診断' },
+  { href: '/living-cost/', label: '生活費' },
+  { href: '/initial-cost/', label: '初期費用' },
+  { href: '/income/', label: '手取り別' },
+  { href: '/rent/', label: '家賃別' },
+  { href: '/guide/', label: 'ガイド' },
+];
+---
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0f766e"/><path d="M32 14 12 31h6v19h28V31h6z" fill="#fff"/><rect x="27" y="36" width="10" height="14" rx="2" fill="#0f766e"/></svg>
+      <span>{SITE_NAME}</span>
+    </a>
+    <nav class="site-nav" aria-label="主要メニュー">
+      <ul>
+        {nav.map((n) => (
+          <li><a href={n.href} aria-current={path === n.href ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

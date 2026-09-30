@@ -1,0 +1,13 @@
+---
+import { SOURCES } from '../data/sources';
+interface Props { ids?: (keyof typeof SOURCES)[] }
+const { ids = ['kakeiSummary2025', 'takkenKokuji'] } = Astro.props;
+const list = ids.map((k) => SOURCES[k]);
+---
+<ul class="sources">
+  {list.map((s) => (
+    <li>
+      <a href={s.url} rel="noopener noreferrer" target="_blank">{s.name}</a>（確認：{s.checkedAt}）
+    </li>
+  ))}
+</ul>
