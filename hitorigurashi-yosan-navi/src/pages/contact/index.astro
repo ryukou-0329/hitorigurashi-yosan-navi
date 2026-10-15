@@ -8,7 +8,14 @@ const breadcrumbs = [
   { name: 'お問い合わせ', path: '/contact/' },
 ];
 
-const CONTACT_FORM_URL: string | null = null;
+/**
+ * お問い合わせフォーム（Googleフォーム等の外部フォーム）のURL。
+ * 現在は未設定のため「準備中」を表示します。
+ * 外部フォームを用意したら、ここに https://... のURLを設定するだけで、リンクが表示されます。
+ * （設定する場合は、/privacy/ に外部フォームサービスでの情報の取り扱いを追記してください）
+ */
+const CONTACT_FORM_URL: string | null =
+  'https://docs.google.com/forms/d/e/1FAIpQLSdcNIrx589ev1j516TOnkHvLouS-v0UyJqleGzoGxLXb2Tv8w/viewform?usp=publish-editor';
 ---
 <BaseLayout title={title} description={description} path="/contact/" breadcrumbs={breadcrumbs}>
   <h1>{title}</h1>
