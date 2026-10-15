@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'お問い合わせ';
+const description = 'ひとり暮らし予算ナビへのお問い合わせページです。';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: 'お問い合わせ', path: '/contact/' },
+];
+
+const CONTACT_FORM_URL: string | null = null;
+---
+<BaseLayout title={title} description={description} path="/contact/" breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <div class="content">
+    <h2>お問い合わせについて</h2>
+    <p>ひとり暮らし予算ナビに関するお問い合わせを受け付けています。サイトの内容や表示についてのご指摘、ご意見・ご要望などがありましたら、お気軽にご連絡ください。</p>
+
+    <h2>ご注意ください</h2>
+    <ul>
+      <li>内容によっては、返信できない場合があります。</li>
+      <li>営業・勧誘などのご連絡には、返信しない場合があります。</li>
+      <li>氏名・住所・電話番号・口座番号・クレジットカード番号・パスワードなどの個人情報や機密情報は、お問い合わせに記載しないでください。</li>
+    </ul>
+
+    <h2>お問い合わせフォーム</h2>
+    {CONTACT_FORM_URL ? (
+      <p>
+        <a href={CONTACT_FORM_URL} target="_blank" rel="noopener noreferrer">お問い合わせフォームを開く（外部サイトが開きます）</a>
+      </p>
+    ) : (
+      <p class="placeholder">お問い合わせフォームは現在準備中です。</p>
+    )}
+  </div>
+</BaseLayout>
