@@ -163,5 +163,22 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 /* 広告ブロック（/initial-cost/ のみ）。既存の .content を再利用し、PR表記を明示 */
 .pr-block h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 0; font-size: 1.05rem; }
 .pr-badge { display: inline-block; padding: 1px 10px; border-radius: 6px; background: #4b5b60; color: #fff; font-size: 0.8125rem; font-weight: 700; line-height: 1.6; }
-.pr-block__link { margin: 0 0 0.75em; padding: 12px 14px; background: var(--c-primary-soft); border-radius: 12px; overflow-wrap: anywhere; }
-.pr-block__link a { font-weight: 700; }
+.pr-block__link { margin: 14px 0 12px; padding: 0; background: transparent; border-radius: 12px; }
+.pr-block__link a {
+  display: block;
+  padding: 14px 16px;
+  background: var(--c-primary);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.pr-block__link a:hover { background: var(--c-primary-dark); color: #fff; }
+.pr-block__link a:active { transform: translateY(1px); }
+@media (min-width: 520px) {
+  .pr-block__link a { padding: 15px 20px; }
+}
