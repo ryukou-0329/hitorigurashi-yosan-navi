@@ -11,6 +11,14 @@ const breadcrumbs = [
   { name: 'ホーム', path: '/' },
   { name: '初期費用シミュレーター', path: '/initial-cost/' },
 ];
+
+/**
+ * A8.net 素材ID 013（GMOとくとくBB WiMAX +5G）の広告コード。
+ * 成果計測のため、A8.netが発行したコードを一切変更せず、そのまま出力します
+ * （アフィリエイトURL・a8mat・rel="nofollow"・1×1の計測画像を含む）。
+ */
+const A8_AD_CODE = `<a href="https://px.a8.net/svt/ejp?a8mat=4BEHX8+67V08I+50+3H3TCI" rel="nofollow">【GMOとくとくBB WiMAX +5G】工事不要の最新Wi-Fiルーターが月額1,375円（税込）〜</a>
+<img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=4BEHX8+67V08I+50+3H3TCI" alt="">`;
 ---
 <BaseLayout title={title} description={description} path="/initial-cost/" breadcrumbs={breadcrumbs}
   jsonLd={[webAppLd({ name: title, description, path: '/initial-cost/' }, Astro.site)]}>
@@ -25,4 +33,12 @@ const breadcrumbs = [
     <p>「想定初期費用」と表示されるのは、必要な項目がすべて入力されたときだけです。入力していない項目がある間は「入力済み項目の合計」と表示され、実際の初期費用より少なくなっている可能性があります。</p>
     <SourceList ids={['takkenKokuji']} />
   </div>
+
+  <aside class="content pr-block" aria-labelledby="pr-internet-title">
+    <h2 id="pr-internet-title">新居のインターネット環境も忘れずに <span class="pr-badge">PR</span></h2>
+    <p>引越しでは、インターネットの契約・開通も必要になります。固定回線のほかに、工事不要のサービス（WiMAX +5Gなど）も選択肢になります。</p>
+    <p class="pr-block__link" set:html={A8_AD_CODE} />
+    <p class="hint">※広告です。料金・キャンペーン・提供条件などは変更される場合があります。申込前に、必ず提供元（広告主）の公式ページでご確認ください。</p>
+    <p class="hint"><a href="/disclosure/">広告・PR表記について</a></p>
+  </aside>
 </BaseLayout>
