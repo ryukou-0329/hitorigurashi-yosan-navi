@@ -1,0 +1,260 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SourceList from '../../components/SourceList.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { RENT_AMOUNTS } from '../../data/pages';
+import { KAKEI, statBasis } from '../../data/statistics';
+import { agentFeeReference } from '../../lib/calc';
+import { manYen, yen } from '../../lib/format';
+
+const title = '一人暮らしの初期費用はいくら？家賃別の目安とシミュレーション';
+const description =
+  '一人暮らしの初期費用は、家賃・契約条件・引越し・家具家電で変わります。家賃別の計算例（条件を明示）、30万円・50万円の考え方、費用を抑える方法、入居後のお金の注意点を整理。自分の場合は無料の計算ツールで確認できます。';
+const path = '/initial-cost-guide/';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '一人暮らしの初期費用ガイド', path },
+];
+
+const UPDATED = '2026-10-29';
+
+// ---- 家賃別の計算例（家賃から計算できる費用だけ） ----
+// 条件: 前家賃＝家賃1か月分 / 仲介手数料＝家賃0.5か月分＋消費税10%の場合の参考額 / 敷金・礼金は各0・1・2か月分の3パターン
+const EXAMPLE_RENTS = [50000, 60000, 70000, 80000, 100000];
+const DEPOSIT_KEY_MONTHS = [0, 1, 2];
+const rentLinked = (rent: number, months: number) => rent + agentFeeReference(rent) + rent * months * 2;
+const rows = EXAMPLE_RENTS.map((rent) => ({
+  rent,
+  values: DEPOSIT_KEY_MONTHS.map((m) => rentLinked(rent, m)),
+}));
+
+// ---- 30万円・50万円との差（敷金・礼金が各1か月分のパターンとの差） ----
+const FUNDS = [300000, 500000];
+const diffRows = EXAMPLE_RENTS.map((rent) => {
+  const linked = rentLinked(rent, 1);
+  return { rent, linked, diffs: FUNDS.map((f) => f - linked) };
+});
+
+// ---- 既存の家賃別ページ（実在するURLだけをリンク） ----
+const rentPages = EXAMPLE_RENTS.filter((r) => (RENT_AMOUNTS as readonly number[]).includes(r));
+
+// ---- 参考：2025年・単身世帯の月平均（家計調査）----
+const statRows = [
+  { item: KAKEI.consumption.item, amount: KAKEI.consumption.amountYen },
+  { item: KAKEI.food.item, amount: KAKEI.food.amountYen },
+  { item: KAKEI.housing.item, amount: KAKEI.housing.amountYen },
+  { item: KAKEI.utilities.item, amount: KAKEI.utilities.amountYen },
+];
+---
+<BaseLayout title={title} description={description} path={path} breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <p class="lead">最終更新日：{UPDATED}</p>
+
+  <article class="content">
+    <p>一人暮らしを始めるときは、毎月の家賃とは別に、契約にかかるお金、引越し代、家具・家電の購入費など、まとまった金額が必要になります。</p>
+    <p>必要な金額は、家賃や契約条件、引越しの条件、すでに持っている家具・家電の量によって大きく変わります。そのため、一般的な目安を知るだけでなく、自分の条件で計算してみることが大切です。</p>
+
+    <div class="cta-box">
+      <a class="cta-button" href="/initial-cost/">自分の場合の初期費用を計算する</a>
+      <p class="hint">家賃・貯金・見積書の金額を入力すると、初期費用の合計と、支払い後に貯金がいくら残るかを確認できます。入力内容はブラウザ内だけで計算し、送信・保存しません。</p>
+    </div>
+
+    <p>この記事では、次の内容を順に整理します。</p>
+    <ul>
+      <li><a href="#items">初期費用に含まれるもの</a></li>
+      <li><a href="#by-rent">家賃別に見る初期費用の目安（計算例）</a></li>
+      <li><a href="#budget">初期費用30万円・50万円で一人暮らしはできる？</a></li>
+      <li><a href="#save">初期費用を抑える方法</a></li>
+      <li><a href="#after">忘れやすい「入居後のお金」</a></li>
+      <li><a href="#simulate">自分の場合はいくら必要か計算する</a></li>
+    </ul>
+
+    <h2 id="items">一人暮らしの初期費用に含まれるもの</h2>
+    <p>初期費用には、部屋を借りるときの契約費用と、暮らし始めるための費用があります。どの項目がかかるか、いくらになるかは、物件・契約・地域・時期によって変わります。</p>
+
+    <h3>部屋を借りるときにかかる費用</h3>
+    <ul>
+      <li><strong>敷金</strong>：家賃の滞納や退去時の原状回復などに備えて、貸主に預けるお金。契約内容により、退去時に精算されます。</li>
+      <li><strong>礼金</strong>：貸主へのお礼として支払うお金。原則として返還されません。ない物件もあります。</li>
+      <li><strong>前家賃</strong>：入居時に支払う家賃。日割り家賃や翌月分などの形で、契約時に支払う場合があります。</li>
+      <li><strong>仲介手数料</strong>：不動産会社に支払う手数料。金額や扱いは、契約・承諾状況などによって異なります。</li>
+      <li><strong>保証会社関連費用</strong>：連帯保証人の代わりに家賃保証会社を利用する場合にかかる費用。</li>
+      <li><strong>火災保険</strong>：入居時に加入を求められることが多い保険の保険料。</li>
+      <li><strong>鍵交換など</strong>：入居前の鍵交換費用など。見積書には、物件によってこのほかの名目の費用が載ることもあります。</li>
+    </ul>
+
+    <h3>暮らし始めるためにかかる費用</h3>
+    <ul>
+      <li><strong>引越し費用</strong>：距離、荷物の量、時期、依頼する業者によって変わります。</li>
+      <li><strong>家具・家電</strong>：買いそろえる量で大きく変わります。手持ちのものを使えば減らせます。</li>
+      <li><strong>その他</strong>：カーテン、寝具、食器、日用品など、生活を始めるために必要なもの。</li>
+    </ul>
+    <p>それぞれの意味は<a href="/guide/">一人暮らしのお金の基礎ガイド</a>でも整理しています。</p>
+
+    <h2 id="by-rent">家賃別に見る初期費用の目安（計算例）</h2>
+    <p>ここでは、家賃から計算できる費用だけを、次の条件で計算した<strong>参考例</strong>を示します。実際の契約条件によって、金額は大きく変わります。</p>
+
+    <h3>計算条件</h3>
+    <ul>
+      <li><strong>敷金・礼金</strong>：それぞれ0か月分・1か月分・2か月分の3パターン。標準的な月数を示すものではありません。</li>
+      <li><strong>前家賃</strong>：家賃1か月分とします。実際は入居日などによって変わります。</li>
+      <li><strong>仲介手数料</strong>：家賃0.5か月分＋消費税10%の場合の参考額（家賃×0.55か月分）です。契約・承諾状況などによって実際の金額は異なるため、見積書・契約内容を確認してください。</li>
+      <li><strong>含まれないもの</strong>：保証会社関連費用、火災保険、鍵交換など、引越し費用、家具・家電、その他の費用。これらは見積書などの金額を、別に加える必要があります。</li>
+    </ul>
+
+    <h3>家賃別の計算例（家賃から計算できる費用の合計）</h3>
+    <div class="table-wrap">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>家賃</th>
+            <th class="num">敷金・礼金<br />各0か月分</th>
+            <th class="num">敷金・礼金<br />各1か月分</th>
+            <th class="num">敷金・礼金<br />各2か月分</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr>
+              <th scope="row">{manYen(r.rent)}</th>
+              {r.values.map((v) => <td class="num">{yen(v)}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">前家賃（家賃1か月分）と、仲介手数料の参考額（家賃0.55か月分）を含みます。保証会社関連費用・火災保険・鍵交換など・引越し費用・家具家電は含まれていません。</p>
+    <p>表の金額に、上記の「含まれないもの」が加わります。気になる家賃のページでは、仲介手数料の参考額や敷金・礼金の計算例を確認できます。</p>
+    <ul class="link-grid">
+      {rentPages.map((r) => <li><a href={`/rent/${r}/`}>家賃<br />{manYen(r)}</a></li>)}
+    </ul>
+    <p>見積書の金額で計算したい場合は、<a href="/initial-cost/">初期費用シミュレーター</a>に入力すると、合計と支払い後の貯金を確認できます。</p>
+
+    <h2 id="budget">初期費用30万円・50万円で一人暮らしはできる？</h2>
+    <p>「できる」「できない」とひとことで言えるものではなく、次のような条件によって変わります。</p>
+    <ul>
+      <li>家賃の金額</li>
+      <li>敷金・礼金の月数（ない物件もあります）</li>
+      <li>引越しの距離と荷物の量、時期</li>
+      <li>家具・家電を新しく買う量と、手持ちのもの</li>
+      <li>保証会社・火災保険など、契約条件で決まる費用</li>
+    </ul>
+
+    <h3>家賃から計算できる費用を引いた残り</h3>
+    <p>手元の資金から、上の表の「敷金・礼金各1か月分」の金額を引いた残りです。この残りで、保証会社関連費用・火災保険・鍵交換など・引越し費用・家具家電などをまかなう必要があります。マイナスの場合は、家賃から計算できる費用だけで、手元の資金を超えています。</p>
+    <div class="table-wrap">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>家賃</th>
+            <th class="num">家賃から計算できる費用<br />（敷金・礼金各1か月分）</th>
+            {FUNDS.map((f) => <th class="num">{manYen(f)}との差</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {diffRows.map((r) => (
+            <tr>
+              <th scope="row">{manYen(r.rent)}</th>
+              <td class="num">{yen(r.linked)}</td>
+              {r.diffs.map((d) => <td class="num">{yen(d)}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">単純な引き算です。残りが大きいほど、ほかの費用に回せる金額も大きくなりますが、必要な金額は引越しや家具家電の条件で変わります。</p>
+    <p>30万円の場合は、家賃や敷金・礼金の条件によって、残りの金額が小さくなりやすいため、ほかの費用の見積もりを先に確認しておくと安心です。50万円の場合は、残りに余裕が出る条件もありますが、家具・家電を多く買いそろえる場合や、敷金・礼金が多い場合は、必要な金額が変わります。</p>
+    <p>いずれの場合も、初期費用を払ったあとに、入居後の生活費を払える貯金が残るかも合わせて確認しましょう。</p>
+
+    <h2 id="save">初期費用を抑える方法</h2>
+    <ul>
+      <li><strong>敷金・礼金の条件を比較する</strong>：同じような家賃の物件でも、月数は物件ごとに異なります。</li>
+      <li><strong>仲介手数料を確認する</strong>：金額や、どのような契約・承諾のもとでの金額かを見積書で確認します。</li>
+      <li><strong>引越し時期を調整する</strong>：時期によって料金が変わることがあります。</li>
+      <li><strong>複数の引越し会社を比較する</strong>：同じ条件で見積もりを取り、内容と金額を比べます。</li>
+      <li><strong>家具・家電を最初から全部そろえない</strong>：手持ちのものを使い、必要になってから買い足す方法もあります。</li>
+      <li><strong>不要なオプションがないか確認する</strong>：契約内容を確認し、必須の項目と任意の項目を区別します。</li>
+    </ul>
+    <p>ただし、初期費用の安さだけで契約を決めるのはおすすめできません。毎月の家賃、更新料、退去時の費用、契約の条件も含めて、総合的に比べましょう。</p>
+
+    <h2 id="after">忘れやすい「入居後のお金」にも注意</h2>
+    <p>初期費用で貯金を使い切ってしまうと、入居後の生活費の支払いに余裕がなくなるおそれがあります。入居後には、次のようなお金が毎月かかります。</p>
+    <ul>
+      <li>家賃</li>
+      <li>食費</li>
+      <li>水道光熱費</li>
+      <li>通信費</li>
+      <li>日用品</li>
+      <li>交通費</li>
+      <li>その他の生活費</li>
+    </ul>
+
+    <h3>参考：2025年・単身世帯の月平均</h3>
+    <div class="table-wrap">
+      <table class="guide-table">
+        <thead>
+          <tr><th>項目</th><th class="num">月平均額</th></tr>
+        </thead>
+        <tbody>
+          {statRows.map((s) => <tr><th scope="row">{s.item}</th><td class="num">{yen(s.amount)}</td></tr>)}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">総務省統計局「家計調査」2025年平均の、単身世帯（世帯主の平均年齢58.6歳、勤労者以外の世帯を含む）の1か月あたりの支出の平均です（{statBasis(KAKEI.consumption)}ほか）。<strong>初期費用の金額ではなく</strong>、20代など若い世代に絞った数値でもありません。住居の平均には持ち家などの世帯も含まれるため、賃貸の家賃とは一致しません。</p>
+    <SourceList ids={['kakeiSummary2025']} />
+    <p>自分の手取り・家賃・生活スタイルで、毎月いくら残るかは、<a href="/living-cost/">生活費シミュレーター</a>で確認できます。初期費用と生活費をまとめて見たい場合は、<a href="/">総合診断</a>も使えます。</p>
+
+    <h2 id="simulate">自分の場合はいくら必要？シミュレーションしてみよう</h2>
+    <p>一人暮らしの初期費用は、家賃や契約条件、引越し・家具家電の条件で変わります。家賃と貯金を入力し、見積書の金額がわかる項目を入れると、初期費用の合計と、支払い後に貯金がいくら残るかを確認できます。</p>
+    <div class="cta-box">
+      <a class="cta-button" href="/initial-cost/">一人暮らしの初期費用を計算する</a>
+      <p class="hint">入力内容はブラウザ内だけで計算し、送信・保存しません。</p>
+    </div>
+    <Disclaimer />
+  </article>
+</BaseLayout>
+
+<style>
+  .cta-box {
+    margin: 1.25em 0;
+    padding: 16px;
+    background: var(--c-primary-soft);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .cta-button,
+  .cta-button:hover {
+    color: #fff;
+  }
+  .cta-button {
+    display: block;
+    padding: 14px 16px;
+    min-height: 48px;
+    background: var(--c-primary);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    text-decoration: none;
+  }
+  .cta-button:hover {
+    background: var(--c-primary-dark);
+  }
+  .cta-box .hint {
+    margin-top: 10px;
+    text-align: left;
+  }
+  h2[id] {
+    scroll-margin-top: 12px;
+  }
+  .guide-table th,
+  .guide-table td {
+    padding: 8px 4px;
+    font-size: 0.8125rem;
+  }
+  .guide-table th {
+    white-space: normal;
+  }
+  .table-wrap + .hint {
+    margin-bottom: 1em;
+  }
+</style>
