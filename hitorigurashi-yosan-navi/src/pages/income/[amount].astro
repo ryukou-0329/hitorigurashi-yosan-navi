@@ -61,6 +61,9 @@ const compare = [{ label: statBasis(K.consumption), value: K.consumption.amountY
     <ul class="link-grid">
       {INCOME_AMOUNTS.filter((a) => a !== amount).map((a) => <li><a href={`/income/${a}/`}>手取り<br />{manYen(a)}</a></li>)}
     </ul>
+    {amount === 200000 && (
+      <p><a href="/income-20-guide/">手取り20万円で一人暮らしする場合の家賃・生活費の詳しい計算例</a>も確認できます。</p>
+    )}
     <p><a href="/rent/">家賃別の初期費用</a>も確認できます。</p>
     <SourceList ids={['kakeiSummary2025']} />
   </div>
