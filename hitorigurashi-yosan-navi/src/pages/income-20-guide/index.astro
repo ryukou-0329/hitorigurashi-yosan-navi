@@ -1,0 +1,248 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SourceList from '../../components/SourceList.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { INCOME_AMOUNTS } from '../../data/pages';
+import { KAKEI } from '../../data/statistics';
+import { manYen, yen } from '../../lib/format';
+
+const title = '手取り20万円で一人暮らしできる？家賃別の生活費をシミュレーション';
+const description =
+  '手取り20万円で一人暮らしをした場合の生活費を、家賃5万〜8万円で比較。食費・水道光熱費は総務省「家計調査」の単身世帯の統計値、そのほかは計算例の仮定で、毎月いくら残るかを整理します。自分の家賃・生活費でも計算できます。';
+const path = '/income-20-guide/';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '手取り20万円の一人暮らしガイド', path },
+];
+const UPDATED = '2026-10-29';
+
+// ---- 前提 ----
+const TAKE_HOME = 200000;
+const RENTS = [50000, 60000, 70000, 80000];
+
+// 統計値（食費・水道光熱費）は、既存の statistics.ts（2025年・単身世帯）の値をそのまま使う
+const food = KAKEI.food.amountYen;
+const utilities = KAKEI.utilities.amountYen;
+
+// 計算例の仮定。統計値ではありません。実際の金額は人によって大きく異なります。
+const ASSUMED = {
+  phone: 5000, // スマホ料金
+  commute: 5000, // 通勤交通費（自己負担分）
+  hobby: 15000, // 趣味・娯楽費
+  other: 20000, // その他（日用品・被服・交際費・保険など）
+} as const;
+
+const cases = RENTS.map((rent) => {
+  const total = rent + food + utilities + ASSUMED.phone + ASSUMED.commute + ASSUMED.hobby + ASSUMED.other;
+  return { rent, total, remain: TAKE_HOME - total };
+});
+const c5 = cases[0]!;
+const c6 = cases[1]!;
+const c7 = cases[2]!;
+const c8 = cases[3]!;
+
+// 前提の表の行（家賃以外は、どの家賃でも同じ金額）。区分で、統計値と仮定を分けて表示する
+const premiseRows = [
+  { label: '食費', value: food, kind: '統計値' },
+  { label: '水道光熱費', value: utilities, kind: '統計値' },
+  { label: 'スマホ料金', value: ASSUMED.phone, kind: '仮定' },
+  { label: '通勤交通費', value: ASSUMED.commute, kind: '仮定' },
+  { label: '趣味・娯楽費', value: ASSUMED.hobby, kind: '仮定' },
+  { label: 'その他', value: ASSUMED.other, kind: '仮定' },
+];
+const nonRentTotal = premiseRows.reduce((sum, r) => sum + r.value, 0);
+
+// 既存の手取り別ページ（実在する場合だけリンク）
+const hasIncomePage = (INCOME_AMOUNTS as readonly number[]).includes(TAKE_HOME);
+---
+<BaseLayout title={title} description={description} path={path} breadcrumbs={breadcrumbs}>
+  <h1>{title}</h1>
+  <p class="lead">最終更新日：{UPDATED}</p>
+
+  <article class="content">
+    <p>手取り20万円で一人暮らしを考えるとき、「家賃はいくらまで？」「毎月いくら残る？」「貯金はできる？」と気になる方は多いと思います。</p>
+    <p>これらは、家賃や生活スタイルによって変わります。そのため、一般的な目安を知ったうえで、実際に自分の数字を入れて確認することが大切です。</p>
+
+    <div class="cta-box">
+      <a class="cta-button" href="/living-cost/">自分の場合の生活費を計算する</a>
+      <p class="hint">手取り・家賃・食費・スマホ料金などを入力すると、毎月いくら残るかを確認できます。入力内容はブラウザ内だけで計算し、送信・保存しません。</p>
+    </div>
+
+    <p>この記事では、次の流れで整理します。</p>
+    <ul>
+      <li><a href="#can">手取り20万円で一人暮らしはできる？</a></li>
+      <li><a href="#rent">手取り20万円の家賃はいくらで考える？</a></li>
+      <li><a href="#sim">家賃別に生活費をシミュレーション</a></li>
+      <li><a href="#saving">手取り20万円で貯金するには？</a></li>
+      <li><a href="#cut">生活費を抑えるならどこを見る？</a></li>
+      <li><a href="#initial">一人暮らしを始める前に初期費用も確認</a></li>
+    </ul>
+
+    <h2 id="can">手取り20万円で一人暮らしはできる？</h2>
+    <p>家賃と生活費の組み合わせによっては成り立つ場合もありますが、毎月残る金額には大きな差が出ます。「きつい」と感じるかどうかも、家賃だけでなく、食費・趣味・固定費の組み合わせや、貯金の目標によって変わります。</p>
+    <p>考え方はシンプルです。毎月使える金額は手取りの200,000円で、そこから「家賃」と「生活費」を引いた残りが、貯金や予備に回せる金額のもとになります。</p>
+    <ul>
+      <li>家賃</li>
+      <li>食費</li>
+      <li>水道光熱費</li>
+      <li>通信費（スマホ料金など）</li>
+      <li>交通費</li>
+      <li>趣味・娯楽費</li>
+      <li>その他の支出（日用品、被服、交際費など）</li>
+    </ul>
+    <p>これらの合計が人によって違うため、同じ手取りでも残る金額は変わります。</p>
+    {hasIncomePage && (
+      <p>手取り別の家賃と残りの早見表は、<a href="/income/200000/">手取り20万円の一人暮らし（家賃別の残り）</a>でも確認できます。</p>
+    )}
+
+    <h2 id="rent">手取り20万円の家賃はいくらで考える？</h2>
+    <p>「家賃は手取りの○分の1」といった目安が語られることがありますが、収入や生活スタイルによって合う割合は変わります。この記事では、特定の割合を基準にしません。</p>
+    <p>家賃が高くなるほど、次のような点に影響します。</p>
+    <ul>
+      <li>毎月自由に使える金額</li>
+      <li>貯金できる金額</li>
+      <li>急な出費への余裕</li>
+    </ul>
+    <p>次の4つの家賃で比べます。手取り{manYen(TAKE_HOME)}に対する家賃の割合は、
+      {cases.map((c, i) => <span>{i > 0 ? '、' : ''}{manYen(c.rent)}で{Math.round((c.rent / TAKE_HOME) * 100)}%</span>)}です。</p>
+
+    <h2 id="sim">家賃別に生活費をシミュレーション</h2>
+    <p><strong>以下は計算例です。</strong>食費と水道光熱費は公的統計の値、そのほかの項目は計算のために置いた仮定です。2つを混同しないようご注意ください。</p>
+
+    <h3>計算例の前提（毎月・家賃以外は共通）</h3>
+    <div class="table-wrap">
+      <table class="guide-table">
+        <thead>
+          <tr><th>項目</th><th class="num">金額</th><th>区分</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">手取り</th><td class="num">{yen(TAKE_HOME)}</td><td>前提</td></tr>
+          {premiseRows.map((r) => (
+            <tr><th scope="row">{r.label}</th><td class="num">{yen(r.value)}</td><td>{r.kind}</td></tr>
+          ))}
+          <tr class="total"><th scope="row">家賃以外の合計</th><td class="num">{yen(nonRentTotal)}</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint"><strong>統計値</strong>：総務省統計局「家計調査」2025年平均の、単身世帯の食料・光熱・水道の月平均額です。単身世帯全体（世帯主の平均年齢58.6歳、勤労者以外を含む）の平均で、<strong>20代だけの平均ではありません</strong>。</p>
+    <p class="hint"><strong>仮定</strong>：スマホ料金・通勤交通費・趣味・娯楽費・その他は、統計値ではなく、この記事の計算のために置いた仮定です。実際の金額は人によって大きく異なります。</p>
+
+    <h3>家賃別の結果</h3>
+    <p>上の「家賃以外の合計」{yen(nonRentTotal)}に、家賃を足して、手取り{yen(TAKE_HOME)}から引いた金額です。</p>
+    <div class="table-wrap">
+      <table class="guide-table">
+        <thead>
+          <tr><th>家賃</th><th class="num">支出合計</th><th class="num">毎月残る金額</th></tr>
+        </thead>
+        <tbody>
+          {cases.map((c) => (
+            <tr><th scope="row">{manYen(c.rent)}</th><td class="num">{yen(c.total)}</td><td class="num">{yen(c.remain)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">毎月残る金額＝手取り − 支出合計（家賃＋家賃以外の合計）。貯金できる金額を示すものではありません。</p>
+    <SourceList ids={['kakeiSummary2025']} />
+
+    <h2 id="rent-5">家賃5万円の場合</h2>
+    <p>この計算例では、支出の合計は{yen(c5.total)}で、手取り{yen(TAKE_HOME)}から引くと、毎月{yen(c5.remain)}残ります。12か月分では{yen(c5.remain * 12)}です。</p>
+    <p>ただし、この残りは、貯金に回せる金額とは限りません。急な出費や、この計算例に含めていない支出も、この残りから出ることになります。</p>
+
+    <h2 id="rent-6">家賃6万円の場合</h2>
+    <p>この計算例では、支出の合計は{yen(c6.total)}で、毎月{yen(c6.remain)}残ります。家賃5万円の場合より、残る金額は{yen(c5.remain - c6.remain)}少なくなります。</p>
+
+    <h2 id="rent-7">家賃7万円の場合</h2>
+    <p>この計算例では、支出の合計は{yen(c7.total)}で、毎月{yen(c7.remain)}残ります。家賃6万円の場合より、残る金額は{yen(c6.remain - c7.remain)}少なくなります。</p>
+
+    <h2 id="rent-8">家賃8万円の場合</h2>
+    <p>この計算例では、支出の合計は{yen(c8.total)}で、毎月{yen(c8.remain)}残ります。家賃7万円の場合より、残る金額は{yen(c7.remain - c8.remain)}少なくなります。</p>
+    <p>家賃を5万円から8万円に上げると、この計算例では、毎月の残りが{yen(c5.remain)}から{yen(c8.remain)}に変わります。ほかの条件を同じにすると、家賃が上がった分だけ、残る金額が減ります。食費や趣味、通信費などが変われば、残る金額も変わります。</p>
+
+    <h2 id="saving">手取り20万円で貯金するには？</h2>
+    <p>毎月残った金額が、そのまますべて貯金できるとは限りません。生活のなかでは、次のような出費が発生する可能性があります。</p>
+    <ul>
+      <li>医療費</li>
+      <li>日用品の買い足し</li>
+      <li>冠婚葬祭</li>
+      <li>家電の故障・買い替え</li>
+      <li>更新費用</li>
+      <li>帰省・旅行</li>
+    </ul>
+    <p>こうした出費がある月は、残る金額が小さくなります。そのため、貯金の金額を決めるときは、残った金額のすべてを貯金に回す前提にせず、急な出費に備える分を残して考えると安心です。</p>
+    <p>毎月いくら貯金に回せるかは、<a href="/living-cost/">生活費シミュレーター</a>で自分の条件を入力して確認できます。</p>
+
+    <h2 id="cut">生活費を抑えるならどこを見る？</h2>
+    <p>節約は、無理のない範囲で、金額の大きい項目から確認するのが基本です。</p>
+    <ul>
+      <li><strong>家賃</strong>：金額が大きく、毎月かかります。引越しや更新のタイミングで見直せる場合があります。</li>
+      <li><strong>通信費</strong>：スマホや回線の契約内容や料金プランを確認します。</li>
+      <li><strong>サブスク</strong>：使っていないサービスがないか確認します。</li>
+      <li><strong>食費</strong>：外食と自炊のバランスなどを見直します。</li>
+      <li><strong>電気・ガス</strong>：契約プランや使い方を確認します。</li>
+      <li><strong>保険などの固定費</strong>：内容が自分に合っているか確認します。</li>
+    </ul>
+    <p>食費を極端に削るなど、健康を損なうおそれのある節約はおすすめできません。無理のない範囲で、続けられる方法を選びましょう。</p>
+
+    <h2 id="initial">一人暮らしを始める前に初期費用も確認</h2>
+    <p>毎月の生活費とは別に、引越しの際には、敷金・礼金・仲介手数料・引越し費用・家具家電などの初期費用がかかります。初期費用で貯金を使い切らないよう、事前に確認しておくと安心です。</p>
+    <p><a href="/initial-cost-guide/">一人暮らしの初期費用はいくら？家賃別の目安を見る</a>と、家賃から計算できる費用の例や、費用を抑える方法がわかります。見積書の金額で計算したい場合は、<a href="/initial-cost/">初期費用シミュレーター</a>をお使いください。</p>
+
+    <h2 id="calc">自分の家賃・生活費で計算してみよう</h2>
+    <p>この記事の金額は、あくまで計算例です。実際の家賃や生活費を入れて、毎月いくら残るかを確認してみましょう。</p>
+    <div class="cta-box">
+      <a class="cta-button" href="/living-cost/">自分の家賃・生活費で計算してみる</a>
+      <p class="hint">実際の家賃や食費、通信費などを入力して、毎月いくら残るか確認できます。入力内容はブラウザ内だけで計算し、送信・保存しません。</p>
+    </div>
+    <Disclaimer />
+  </article>
+</BaseLayout>
+
+<style>
+  .cta-box {
+    margin: 1.25em 0;
+    padding: 16px;
+    background: var(--c-primary-soft);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .cta-button,
+  .cta-button:hover {
+    color: #fff;
+  }
+  .cta-button {
+    display: block;
+    padding: 14px 16px;
+    min-height: 48px;
+    background: var(--c-primary);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    text-decoration: none;
+  }
+  .cta-button:hover {
+    background: var(--c-primary-dark);
+  }
+  .cta-box .hint {
+    margin-top: 10px;
+    text-align: left;
+  }
+  h2[id] {
+    scroll-margin-top: 12px;
+  }
+  /* スマホ（約320〜375px）でも、表が横にはみ出さないよう余白と文字サイズを調整 */
+  .guide-table th,
+  .guide-table td {
+    padding: 8px 4px;
+    font-size: 0.8125rem;
+  }
+  .guide-table th {
+    white-space: normal;
+  }
+  .guide-table tr.total th,
+  .guide-table tr.total td {
+    font-weight: 700;
+  }
+  .table-wrap + .hint {
+    margin-bottom: 0.5em;
+  }
+</style>
