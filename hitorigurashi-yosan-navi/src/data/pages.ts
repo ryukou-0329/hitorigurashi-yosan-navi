@@ -18,6 +18,7 @@ export const STATIC_PAGES: PageEntry[] = [
   { path: '/guide/', priority: 0.7 },
   { path: '/initial-cost-guide/', priority: 0.7 },
   { path: '/income-20-guide/', priority: 0.7 },
+  { path: '/furniture-appliances-guide/', priority: 0.7 },
   { path: '/about/', priority: 0.3 },
   { path: '/contact/', priority: 0.3 },
   { path: '/privacy/', priority: 0.3 },
