@@ -1,0 +1,245 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { RENT_AMOUNTS } from '../../data/pages';
+import { agentFeeReference } from '../../lib/calc';
+import { manYen, yen } from '../../lib/format';
+
+const h1 = '一人暮らしの家具・家電はいくら？最低限必要なものと予算別シミュレーション';
+// 検索結果で長くなりすぎないよう、<title> は少し短くしている（サイト名は自動で付く）
+const title = '一人暮らしの家具・家電はいくら？最低限の物と予算別シミュレーション';
+const description =
+  '一人暮らしの家具・家電の費用は、買う物・新品か中古か・手持ち品・物件の設備で大きく変わります。最低限必要なもの、最初は買わなくてよいもの、5万〜20万円の予算別の優先順位と、初期費用全体への足し方を整理します。';
+const path = '/furniture-appliances-guide/';
+const breadcrumbs = [
+  { name: 'ホーム', path: '/' },
+  { name: '一人暮らしの家具・家電ガイド', path },
+];
+const UPDATED = '2026-11-05';
+
+// ---- 予算別シミュレーション（計算例）----
+// 家具・家電の予算は「例」であり、平均・相場ではない。個別の商品価格は掲載しない。
+const BUDGETS = [50000, 100000, 150000, 200000];
+
+// 初期費用全体に足したときの合計の計算例。/initial-cost-guide/ と同じ条件:
+//   敷金・礼金は各1か月分 / 前家賃は家賃1か月分 / 仲介手数料は家賃0.5か月分＋消費税10%の場合の参考額
+const EXAMPLE_RENT = 70000;
+const rentLinked = EXAMPLE_RENT + agentFeeReference(EXAMPLE_RENT) + EXAMPLE_RENT * 2;
+const totals = BUDGETS.map((budget) => ({ budget, total: rentLinked + budget }));
+const hasRentPage = (RENT_AMOUNTS as readonly number[]).includes(EXAMPLE_RENT);
+---
+<BaseLayout title={title} description={description} path={path} breadcrumbs={breadcrumbs}>
+  <h1>{h1}</h1>
+  <p class="lead">最終更新日：{UPDATED}</p>
+
+  <article class="content">
+    <p>一人暮らしを始めるときは、敷金・礼金などの契約費用のほかに、冷蔵庫や洗濯機、寝具といった家具・家電をそろえる費用がかかります。「結局、いくら用意すればいいの？」と気になる方が多い部分です。</p>
+    <p>先にお伝えすると、金額をひとつに決めることはできません。買う物、新品か中古か、すでに持っている物、物件に備え付けの設備、商品の性能やブランド、購入の時期などによって、必要な金額は大きく変わります。</p>
+    <p>そこでこの記事では、5万円・10万円・15万円・20万円という4つの「予算の例」で、何を優先し、何を後回しにするかを整理します。そのうえで、実際に買う物のリストを作り、販売価格を確認した合計を、初期費用の計算に入れる流れを紹介します。</p>
+
+    <div class="cta-box">
+      <a class="cta-button" href="/initial-cost/">家具・家電も含めて初期費用を計算する</a>
+      <p class="hint">家賃や貯金、見積書の金額に加えて、家具・家電の購入費を入力すると、初期費用の合計と、支払い後に貯金がいくら残るかを確認できます。入力内容はブラウザ内だけで計算し、送信・保存しません。</p>
+    </div>
+
+    <p>この記事では、次の流れで整理します。</p>
+    <ul>
+      <li><a href="#cost">一人暮らしの家具・家電はいくらかかる？</a></li>
+      <li><a href="#appliances">最低限必要な家電</a></li>
+      <li><a href="#furniture">最低限必要な家具・生活用品</a></li>
+      <li><a href="#later">最初から買わなくてもいいもの</a></li>
+      <li><a href="#budget">家具・家電の予算別シミュレーション</a></li>
+      <li><a href="#save">家具・家電の費用を抑える方法</a></li>
+      <li><a href="#others">家具・家電以外の初期費用も忘れない</a></li>
+      <li><a href="#calc">最後に自分の初期費用を計算</a></li>
+    </ul>
+
+    <h2 id="cost">一人暮らしの家具・家電はいくらかかる？</h2>
+    <p>家具・家電の総額が人によって大きく変わるのは、次のような条件が人それぞれ違うためです。</p>
+    <ul>
+      <li><strong>買う物の数と種類</strong>：すべて新しく買うのか、一部だけ買うのか。</li>
+      <li><strong>新品か中古か</strong>：新品で買うほか、中古やレンタルなどを使う方法もあります。</li>
+      <li><strong>すでに持っている物</strong>：実家や今の住まいから持っていける家具・家電があるか。</li>
+      <li><strong>物件の設備</strong>：エアコン、照明、収納、コンロなどが備え付けかどうか。</li>
+      <li><strong>商品の性能・サイズ・ブランド</strong>：同じ種類の物でも、選ぶ商品で金額が変わります。</li>
+      <li><strong>購入の時期</strong>：セールなどで価格が変わることがあります。</li>
+      <li><strong>配送料・設置料・処分料</strong>：本体価格のほかにかかる場合があります。</li>
+    </ul>
+    <p>このため、この記事では個別の商品価格を「相場」や「平均」として載せていません。実際に買う物の価格は、販売ページや見積書で確認してください。</p>
+
+    <h2 id="appliances">一人暮らしで最低限必要な家電</h2>
+    <p>多くの人が暮らしの始めに検討する家電は、次のとおりです。ただし、<strong>全員が必ず買う物ではありません</strong>。物件の設備一覧と、手持ちの物を照らし合わせて決めましょう。</p>
+    <ul>
+      <li><strong>冷蔵庫</strong>：食品や飲み物の保存に使います。自炊の量によって、必要なサイズが変わります。</li>
+      <li><strong>洗濯機</strong>：洗濯機置き場があるかを確認します。コインランドリーを使う暮らし方もあります。</li>
+      <li><strong>電子レンジ</strong>：温め中心か、調理にも使うかで、必要な機能が変わります。</li>
+      <li><strong>照明</strong>：物件によっては備え付けの場合があります。備え付けでない場合は、取り付け方法も確認します。</li>
+      <li><strong>エアコン</strong>：物件によっては備え付けの場合があります。備え付けの有無や、故障したときの扱いを、契約内容で確認します。</li>
+    </ul>
+
+    <h2 id="furniture">一人暮らしで最低限必要な家具・生活用品</h2>
+    <p>入居した日から困りやすい物は、次のとおりです。</p>
+    <ul>
+      <li><strong>寝具</strong>：布団かベッドかによって、必要な物が変わります。</li>
+      <li><strong>カーテン</strong>：窓のサイズを測って選びます。備え付けの物件もあります。</li>
+      <li><strong>テーブル</strong>：食事や作業に使います。小さなものから始める方法もあります。</li>
+      <li><strong>収納用品</strong>：衣類や日用品の量に合わせて、必要な分だけ検討します。</li>
+      <li><strong>物干し用品</strong>：部屋干しか、ベランダなどで干すかで、必要な物が変わります。</li>
+    </ul>
+    <p>机・椅子、ベッドフレーム、テレビなどは、生活スタイルによって不要な場合もあります。たとえば、在宅で作業するかどうか、布団で寝るかどうか、スマホやパソコンで動画を見るかどうかで、考え方が変わります。</p>
+
+    <h2 id="later">最初から買わなくてもいいもの</h2>
+    <p>次の物は、入居前にそろえなくても、住み始めてから必要かどうかを判断できる場合があります。</p>
+    <ul>
+      <li><strong>テレビ</strong></li>
+      <li><strong>ソファ</strong></li>
+      <li><strong>ベッドフレーム</strong></li>
+      <li><strong>大型の収納家具</strong></li>
+      <li><strong>炊飯器</strong>（生活スタイルによります）</li>
+      <li><strong>掃除機</strong>（部屋の広さや掃除の方法によります）</li>
+    </ul>
+    <p>入居前に全部を買う必要はありません。入居日から困る物を先にそろえ、残りは住んでみて必要を感じてから買い足す、という考え方もあります。そうすれば、初期費用に使う金額を抑えやすくなります。</p>
+
+    <h2 id="budget">家具・家電の予算別シミュレーション</h2>
+    <p><strong>以下は、予算を決めるためのシミュレーション例です。</strong>平均や相場ではなく、個別の商品価格も載せていません。「この金額で必ず買える」というものではなく、購入する物の価格によって変わります。</p>
+
+    <h3>考え方：優先順位を3つに分ける</h3>
+    <ol>
+      <li><strong>入居日から困る物</strong>：寝具、カーテン、冷蔵庫・洗濯機などの確保方法。</li>
+      <li><strong>物件の設備を確認して決める物</strong>：エアコン、照明、収納、コンロなど。</li>
+      <li><strong>後回しにできる物</strong>：テレビ、ソファ、大型の収納家具など。</li>
+    </ol>
+    <p>予算が小さいほど、1を優先し、2と3を絞ったり、手持ちの物や中古で補ったりします。</p>
+
+    <h3>予算5万円の場合</h3>
+    <ul>
+      <li><strong>考え方</strong>：手持ちの物、中古、必要最小限の購入が中心になりやすい予算です。</li>
+      <li><strong>優先しやすい物</strong>：寝具、カーテンなど、入居直後に必要な物。冷蔵庫・洗濯機は、手持ちの物の持ち込み、中古、レンタル、コインランドリーの利用など、選択肢を比べます。</li>
+      <li><strong>後回しにしやすい物</strong>：テレビ、ソファ、収納家具、掃除機など。</li>
+      <li><strong>新品だけでは厳しい場合</strong>：主要な家電をすべて新品でそろえようとすると、予算が足りなくなる場合があります（商品の価格によります）。</li>
+    </ul>
+
+    <h3>予算10万円の場合</h3>
+    <ul>
+      <li><strong>考え方</strong>：生活に直結する物を中心に、新品と中古を使い分けて検討しやすい予算です。</li>
+      <li><strong>優先しやすい物</strong>：冷蔵庫、洗濯機、電子レンジ、寝具、カーテン。物件に備え付けがあれば、その分は買わずに済みます。</li>
+      <li><strong>後回しにしやすい物</strong>：テレビ、ソファ、大型の収納家具など。</li>
+      <li><strong>中古や手持ち品の使い方</strong>：一部の家電や家具を中古にしたり、手持ちの物を使ったりして、全体の予算を調整します。</li>
+    </ul>
+
+    <h3>予算15万円の場合</h3>
+    <ul>
+      <li><strong>考え方</strong>：サイズ・機能・保証などを比べながら選ぶ余地が出てくる場合がある予算です。</li>
+      <li><strong>優先しやすい物</strong>：主要な家電をそろえたうえで、テーブルや収納用品など、暮らしやすさに関わる物を検討します。</li>
+      <li><strong>後回しにしやすい物</strong>：ソファや大型の収納家具など、なくても生活できる物。</li>
+      <li><strong>注意点</strong>：選択肢が増えるぶん、予算を使い切ってしまいやすくなります。優先順位を決めてから選びましょう。</li>
+    </ul>
+
+    <h3>予算20万円の場合</h3>
+    <ul>
+      <li><strong>考え方</strong>：家具・家電を新品で多めにそろえることも検討できる場合がある予算です。</li>
+      <li><strong>優先しやすい物</strong>：主要な家電に加えて、必要に応じて机や椅子、ベッドなどを検討します。</li>
+      <li><strong>注意点</strong>：家具・家電で予算を使い切るのではなく、初期費用全体を払ったあとに、入居後の生活費に回す貯金が残るかも確認します。</li>
+    </ul>
+
+    <h3>初期費用全体に足すと、合計はどうなる？</h3>
+    <p>家具・家電の予算を、初期費用全体に足した計算例です。条件は次のとおりです。</p>
+    <ul>
+      <li><strong>家賃</strong>：{manYen(EXAMPLE_RENT)}</li>
+      <li><strong>敷金・礼金</strong>：それぞれ1か月分（標準的な月数を示すものではありません）</li>
+      <li><strong>前家賃</strong>：家賃1か月分</li>
+      <li><strong>仲介手数料</strong>：家賃0.5か月分＋消費税10%の場合の参考額。契約・承諾状況などによって実際の金額は異なります。</li>
+      <li><strong>含まれないもの</strong>：保証会社関連費用、火災保険、鍵交換など、引越し費用、その他の費用。</li>
+    </ul>
+    <div class="table-wrap">
+      <table class="guide-table">
+        <thead>
+          <tr><th>家具・家電の予算</th><th class="num">家賃から計算できる費用</th><th class="num">合計</th></tr>
+        </thead>
+        <tbody>
+          {totals.map((t) => (
+            <tr><th scope="row">{manYen(t.budget)}</th><td class="num">{yen(rentLinked)}</td><td class="num">{yen(t.total)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">「家賃から計算できる費用」は、前家賃・敷金・礼金・仲介手数料の参考額の合計です。家賃や契約条件が変わると、金額も変わります。</p>
+    <p>家賃や条件が違う場合は、<a href="/initial-cost/">初期費用シミュレーター</a>に入力すると、自分の条件で合計を確認できます。{hasRentPage && (<span>家賃別の計算例は、<a href={`/rent/${EXAMPLE_RENT}/`}>家賃{manYen(EXAMPLE_RENT)}のページ</a>でも見られます。</span>)}</p>
+
+    <h2 id="save">家具・家電の費用を抑える方法</h2>
+    <ul>
+      <li><strong>手持ちの物を使う</strong>：実家や今の住まいにある物で、使える物がないか確認します。</li>
+      <li><strong>最低限だけ購入する</strong>：入居日から困る物を先にそろえます。</li>
+      <li><strong>入居後に買い足す</strong>：住んでみて、必要だと感じた物から購入します。</li>
+      <li><strong>セット商品と単品購入を比べる</strong>：セットのほうが総額を抑えやすい場合もあれば、不要な物が含まれる場合もあります。</li>
+      <li><strong>新品と中古を比べる</strong>：中古は価格を抑えやすい一方、状態や保証、配送の条件を確認します。</li>
+      <li><strong>セールの時期を利用する</strong>：急がない物は、購入のタイミングを調整する方法もあります。</li>
+    </ul>
+    <p>比べるときは、本体の価格だけでなく、<strong>配送料・設置料・保証・古い家電の処分料</strong>なども含めた総額で考えましょう。ただし、安さだけで決めるのはおすすめできません。サイズが部屋や搬入経路に合わないと、買い直しが必要になる場合もあります。</p>
+
+    <h2 id="others">家具・家電以外の初期費用も忘れない</h2>
+    <p>一人暮らしの初期費用には、家具・家電のほかに、敷金・礼金・前家賃・仲介手数料・保証会社関連費用・火災保険・引越し費用などがあります。家具・家電の予算を決めるときも、契約費用とのバランスで考えることが大切です。</p>
+    <p><a href="/initial-cost-guide/">一人暮らしの初期費用はいくら？家賃別の目安を見る</a>と、家賃から計算できる費用の例や、費用を抑える方法がわかります。見積書の金額で計算したい場合は、<a href="/initial-cost/">初期費用シミュレーター</a>をお使いください。</p>
+    <p>各費用の意味は、<a href="/guide/">一人暮らしのお金の基礎ガイド</a>でも整理しています。入居後の毎月の生活費は、<a href="/living-cost/">生活費シミュレーター</a>で確認できます。</p>
+
+    <h2 id="calc">最後に自分の初期費用を計算</h2>
+    <p>家具・家電の費用は、次の順番で整理すると、初期費用の計算に進めます。</p>
+    <ol>
+      <li>必要な物と、手持ちの物を書き出す。</li>
+      <li>買う物の価格を、販売ページや見積書で確認する（送料・設置料・処分料も含める）。</li>
+      <li>合計を、予算の例と比べる。</li>
+      <li>初期費用シミュレーターの「家具・家電の購入費」に入力する。</li>
+    </ol>
+    <div class="cta-box">
+      <a class="cta-button" href="/initial-cost/">家具・家電も含めて初期費用を計算してみる</a>
+      <p class="hint">家賃・貯金に加えて、家具・家電の購入費を入力すると、初期費用の合計と、支払い後に貯金がいくら残るかを確認できます。入力内容はブラウザ内だけで計算し、送信・保存しません。</p>
+    </div>
+    <Disclaimer />
+  </article>
+</BaseLayout>
+
+<style>
+  .cta-box {
+    margin: 1.25em 0;
+    padding: 16px;
+    background: var(--c-primary-soft);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .cta-button,
+  .cta-button:hover {
+    color: #fff;
+  }
+  .cta-button {
+    display: block;
+    padding: 14px 16px;
+    min-height: 48px;
+    background: var(--c-primary);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    text-decoration: none;
+  }
+  .cta-button:hover {
+    background: var(--c-primary-dark);
+  }
+  .cta-box .hint {
+    margin-top: 10px;
+    text-align: left;
+  }
+  h2[id] {
+    scroll-margin-top: 12px;
+  }
+  /* スマホ（約320〜375px）でも、表が横にはみ出さないよう余白と文字サイズを調整 */
+  .guide-table th,
+  .guide-table td {
+    padding: 8px 4px;
+    font-size: 0.8125rem;
+  }
+  .guide-table th {
+    white-space: normal;
+  }
+  .table-wrap + .hint {
+    margin-bottom: 1em;
+  }
+</style>
